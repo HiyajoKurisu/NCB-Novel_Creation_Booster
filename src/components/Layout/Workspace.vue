@@ -29,12 +29,7 @@
     <!-- Middle Column: Main Editor Waterfall -->
     <main class="w-full max-w-3xl mx-auto relative">
       <!-- Mobile header fallback -->
-      <div class="md:hidden flex items-center gap-4 mb-6">
-        <button @click="isMobileNavOpen = true" class="p-2 bg-[var(--bg-secondary)] rounded-md hover:opacity-80 transition-opacity">
-          <MenuIcon class="w-5 h-5" />
-        </button>
-        <h1 class="text-2xl font-black m-0">{{ meta?.title || 'Novel Creation Booster' }}</h1>
-      </div>
+      <h1 class="md:hidden text-2xl font-black mb-6">{{ meta?.title || 'Novel Creation Booster' }}</h1>
 
       <!-- The Waterfall -->
       <div v-if="meta?.chapters">
@@ -56,7 +51,17 @@
     <aside class="w-full md:w-auto order-first md:order-last mb-4 md:mb-0 z-40 sticky top-0 md:static">
       <div class="pt-2 pb-4 md:sticky md:top-8" style="background-color: var(--header-bg); backdrop-filter: blur(8px);" ref="progressBoardRef">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold">Progress</h2>
+          <!-- Mobile Menu Button -->
+          <button 
+            @click="isMobileNavOpen = true" 
+            class="md:hidden p-1.5 rounded bg-[var(--bg-secondary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)]"
+            title="展开菜单"
+          >
+            <MenuIcon class="w-5 h-5" />
+          </button>
+          
+          <!-- Spacer for PC to keep buttons right-aligned -->
+          <div class="hidden md:block"></div>
           <div class="flex items-center gap-2">
             <span v-if="saving" class="text-xs text-[var(--text-secondary)] animate-pulse">Saving...</span>
             <span v-if="error" class="text-xs text-red-500" :title="error">Error</span>
