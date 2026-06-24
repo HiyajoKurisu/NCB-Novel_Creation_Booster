@@ -10,7 +10,12 @@
             <XIcon class="w-5 h-5" />
           </button>
         </div>
-        <h1 class="hidden md:block text-2xl font-black mb-8">{{ meta?.title || 'Novel Creation Booster' }}</h1>
+        <div class="flex items-center mb-8">
+          <button @click="$emit('back')" class="p-2 mr-3 bg-[var(--bg-secondary)] rounded-md hover:bg-[var(--border-color)] transition-colors" title="返回项目列表">
+            <ArrowLeftIcon class="w-5 h-5" />
+          </button>
+          <h1 class="hidden md:block text-2xl font-black m-0">{{ meta?.title || 'Novel Creation Booster' }}</h1>
+        </div>
         <nav class="space-y-2">
           <a 
             v-for="chapter in meta?.chapters" 
@@ -65,6 +70,9 @@
           <div class="flex items-center gap-2">
             <span v-if="saving" class="text-xs text-[var(--text-secondary)] animate-pulse">Saving...</span>
             <span v-if="error" class="text-xs text-red-500" :title="error">Error</span>
+            <button @click="$emit('refresh')" :disabled="saving" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="刷新仓库最新状态">
+              <RefreshCwIcon class="w-4 h-4" />
+            </button>
             <button @click="onExport" :disabled="saving" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="导出全文">
               <DownloadIcon class="w-4 h-4" />
             </button>
@@ -73,6 +81,10 @@
             </button>
             <button @click="onThemeToggle" class="p-1.5 rounded bg-[var(--bg-secondary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)]">
               <PaletteIcon class="w-4 h-4" />
+            </button>
+            <!-- Mobile Back Button -->
+            <button @click="$emit('back')" class="md:hidden p-1.5 rounded bg-[var(--bg-secondary)] text-red-400 hover:bg-red-400/10 transition-colors border border-transparent" title="返回列表">
+              <ArrowLeftIcon class="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -94,7 +106,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { Save, Palette, Download, Menu, X } from 'lucide-vue-next';
+import { Save, Palette, Download, Menu, X, ArrowLeft, RefreshCw } from 'lucide-vue-next';
 import ChapterCard from '../Editor/ChapterCard.vue';
 import SegmentedProgressBar from '../Board/SegmentedProgressBar.vue';
 import GridBlocks from '../Board/GridBlocks.vue';
@@ -104,6 +116,8 @@ const PaletteIcon = Palette;
 const DownloadIcon = Download;
 const MenuIcon = Menu;
 const XIcon = X;
+const ArrowLeftIcon = ArrowLeft;
+const RefreshCwIcon = RefreshCw;
 
 const isMobileNavOpen = ref(false);
 
@@ -114,7 +128,7 @@ const props = defineProps({
   error: String
 });
 
-const emit = defineEmits(['loadChapter', 'updateContent', 'updateSynopsis', 'save', 'saveChapter', 'export', 'toggleTheme']);
+const emit = defineEmits(['loadChapter', 'updateContent', 'updateSynopsis', 'save', 'saveChapter', 'export', 'toggleTheme', 'back', 'refresh']);
 
 const totalCurrentWords = computed(() => {
   return (props.meta?.chapters || []).reduce((sum, ch) => sum + (ch.current_words || 0), 0);

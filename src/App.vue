@@ -1,6 +1,12 @@
 <template>
-  <div v-if="!hasConfig" class="min-h-screen bg-[var(--bg-primary)]">
-    <SettingsModal :initialConfig="githubConfig" @save="onSaveConfig" />
+  <div v-if="!selectedProject" class="min-h-screen bg-[var(--bg-primary)]">
+    <ProjectList 
+      :projects="projects"
+      @add="onAddProject"
+      @remove="removeProject"
+      @select="onSelectProject"
+      @toggleTheme="toggleTheme"
+    />
   </div>
   <div v-else class="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
     <Workspace 
@@ -16,44 +22,58 @@
       @saveChapter="saveChapter"
       @export="exportNovel"
       @toggleTheme="toggleTheme"
+      @back="onBackToProjects"
+      @refresh="onRefresh"
     />
     <div v-else-if="loading" class="min-h-screen flex items-center justify-center">
       <div class="animate-pulse text-xl font-medium text-[var(--text-secondary)]">正在加载小说信息...</div>
     </div>
     <div v-else-if="error" class="min-h-screen flex items-center justify-center flex-col gap-4">
-      <div class="text-red-500 font-bold">错误: {{ error }}</div>
-      <button @click="clearConfig" class="px-4 py-2 text-white rounded shadow-sm" style="background: var(--accent-gradient)">重新配置</button>
+      <div class="text-red-500 font-bold mb-4">错误: {{ error }}</div>
+      <button @click="onBackToProjects" class="px-4 py-2 text-white rounded shadow-sm" style="background: var(--accent-gradient)">返回项目列表</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue';
-import SettingsModal from './components/SettingsModal.vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
+import ProjectList from './components/ProjectList.vue';
 import Workspace from './components/Layout/Workspace.vue';
 import { useEditor } from './composables/useEditor';
 import { useTheme } from './composables/useTheme';
+import { useProjects } from './composables/useProjects';
+
+const { projects, addProject, removeProject, updateProjectTitle } = useProjects();
+const selectedProject = ref(null);
 
 const { 
-  meta, loading, saving, error, githubConfig, chaptersData, 
-  saveConfig, loadMeta, loadChapter, updateChapterContent, updateChapterSynopsis, saveAll,
-  saveChapter, exportNovel
+  meta, loading, saving, error, chaptersData, 
+  initEditor, loadMeta, loadChapter, updateChapterContent, updateChapterSynopsis, saveAll,
+  saveChapter, exportNovel, refreshAll
 } = useEditor();
 
 const { toggleTheme } = useTheme();
 
-const hasConfig = computed(() => !!(githubConfig.token && githubConfig.owner && githubConfig.repo));
-
-const onSaveConfig = async (token, owner, repo) => {
-  saveConfig(token, owner, repo);
-  await loadMeta();
+const onAddProject = (token, userRepo) => {
+  addProject(token, userRepo);
 };
 
-const clearConfig = () => {
-  localStorage.removeItem('ncb_token');
-  localStorage.removeItem('ncb_owner');
-  localStorage.removeItem('ncb_repo');
-  window.location.reload();
+const onSelectProject = async (project) => {
+  selectedProject.value = project;
+  initEditor(project);
+  const loadedMeta = await loadMeta();
+  if (loadedMeta?.title) {
+    updateProjectTitle(project.id, loadedMeta.title);
+  }
+};
+
+const onBackToProjects = () => {
+  selectedProject.value = null;
+  meta.value = null; // Clear workspace state
+};
+
+const onRefresh = () => {
+  refreshAll();
 };
 
 const onManualSave = () => {
@@ -61,8 +81,9 @@ const onManualSave = () => {
 };
 
 // Global Ctrl+S override
+// Global Ctrl+S override
 const handleKeyDown = (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+  if (selectedProject.value && (e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
     onManualSave();
   }
@@ -70,9 +91,6 @@ const handleKeyDown = (e) => {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
-  if (hasConfig.value) {
-    loadMeta();
-  }
 });
 
 onUnmounted(() => {

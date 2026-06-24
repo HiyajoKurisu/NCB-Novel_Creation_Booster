@@ -9,24 +9,22 @@ export function useEditor() {
   const error = ref(null);
   
   const githubConfig = reactive({
-    token: localStorage.getItem('ncb_token') || '',
-    owner: localStorage.getItem('ncb_owner') || '',
-    repo: localStorage.getItem('ncb_repo') || ''
+    token: '',
+    owner: '',
+    repo: ''
   });
 
   let github = null;
-  if (githubConfig.token && githubConfig.owner && githubConfig.repo) {
-    github = new GitHubAPI(githubConfig.token, githubConfig.owner, githubConfig.repo);
-  }
 
-  const saveConfig = (token, owner, repo) => {
-    localStorage.setItem('ncb_token', token);
-    localStorage.setItem('ncb_owner', owner);
-    localStorage.setItem('ncb_repo', repo);
-    githubConfig.token = token;
-    githubConfig.owner = owner;
-    githubConfig.repo = repo;
-    github = new GitHubAPI(token, owner, repo);
+  const initEditor = (project) => {
+    githubConfig.token = project.token;
+    
+    // Split userRepo "owner/repo"
+    const parts = project.userRepo.split('/');
+    githubConfig.owner = parts[0] || '';
+    githubConfig.repo = parts[1] || '';
+    
+    github = new GitHubAPI(githubConfig.token, githubConfig.owner, githubConfig.repo);
   };
 
   const loadMeta = async () => {
@@ -37,8 +35,10 @@ export function useEditor() {
       const data = await github.getFile('meta.json');
       meta.value = JSON.parse(data.content);
       metaSha.value = data.sha;
+      return meta.value;
     } catch (err) {
       error.value = err.message;
+      return null;
     } finally {
       loading.value = false;
     }
@@ -60,7 +60,7 @@ export function useEditor() {
     loading.value = true;
     try {
       // 1. Try local cache first
-      const localCache = localStorage.getItem(`ncb_draft_${chapterId}`);
+      const localCache = localStorage.getItem(`ncb_draft_${githubConfig.repo}_${chapterId}`);
       if (localCache) {
         const parsed = JSON.parse(localCache);
         chaptersData[chapterId] = parsed;
@@ -110,7 +110,7 @@ export function useEditor() {
     // High frequency local cache
     clearTimeout(localSaveTimer);
     localSaveTimer = setTimeout(() => {
-      localStorage.setItem(`ncb_draft_${chapterId}`, JSON.stringify(chaptersData[chapterId]));
+      localStorage.setItem(`ncb_draft_${githubConfig.repo}_${chapterId}`, JSON.stringify(chaptersData[chapterId]));
     }, 1000);
     
     resetAutoSave();
@@ -179,7 +179,7 @@ export function useEditor() {
         chapter.dirty = false;
         
         // Clear local cache
-        localStorage.removeItem(`ncb_draft_${id}`);
+        localStorage.removeItem(`ncb_draft_${githubConfig.repo}_${id}`);
       }
 
       // 2. Update meta.json with new word counts
@@ -236,7 +236,7 @@ export function useEditor() {
       chapter.dirty = false;
       
       // Clear local cache
-      localStorage.removeItem(`ncb_draft_${chapterId}`);
+      localStorage.removeItem(`ncb_draft_${githubConfig.repo}_${chapterId}`);
 
       // Update meta.json with new word counts
       const metaUpdateRes = await github.updateFile(
@@ -299,6 +299,21 @@ export function useEditor() {
     }
   };
 
+  const refreshAll = async () => {
+    if (!github || saving.value || loading.value) return;
+    
+    // Clear in-memory dirty drafts if any (user should be warned before calling this)
+    for (const id in chaptersData) {
+      if (chaptersData[id]) {
+        chaptersData[id].content = undefined;
+        chaptersData[id].dirty = false;
+      }
+    }
+    
+    await loadMeta();
+    // Chapters will be re-fetched when ChapterCard emits 'load' event since their content is now undefined
+  };
+
   return {
     meta,
     loading,
@@ -306,7 +321,7 @@ export function useEditor() {
     error,
     githubConfig,
     chaptersData,
-    saveConfig,
+    initEditor,
     loadMeta,
     loadChapter,
     updateChapterContent,
@@ -314,6 +329,7 @@ export function useEditor() {
     saveAll,
     saveChapter,
     exportNovel,
+    refreshAll,
     countWords
   };
 }
