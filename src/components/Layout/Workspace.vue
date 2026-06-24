@@ -2,16 +2,22 @@
   <div class="min-h-screen grid grid-cols-1 md:grid-cols-[250px_1fr_250px] gap-8 p-4 md:p-8 max-w-[1600px] mx-auto relative">
     
     <!-- Left Column: Navigation -->
-    <aside class="hidden md:block">
-      <div class="sticky top-8 overflow-y-auto max-h-[calc(100vh-4rem)] pr-4 custom-scrollbar">
-        <h1 class="text-2xl font-black mb-8">{{ meta?.title || 'Novel Creation Booster' }}</h1>
+    <aside :class="['fixed inset-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md transition-transform transform md:relative md:transform-none md:block md:bg-transparent md:z-auto p-4 md:p-0', isMobileNavOpen ? 'translate-x-0' : '-translate-x-full']">
+      <div class="sticky top-8 overflow-y-auto h-full md:max-h-[calc(100vh-4rem)] pr-4 custom-scrollbar">
+        <div class="flex justify-between items-center mb-8 md:hidden">
+          <h1 class="text-xl font-black">章节导航</h1>
+          <button @click="isMobileNavOpen = false" class="p-2 bg-[var(--bg-secondary)] rounded-md">
+            <XIcon class="w-5 h-5" />
+          </button>
+        </div>
+        <h1 class="hidden md:block text-2xl font-black mb-8">{{ meta?.title || 'Novel Creation Booster' }}</h1>
         <nav class="space-y-2">
           <a 
             v-for="chapter in meta?.chapters" 
             :key="chapter.id"
             :href="`#chapter-${chapter.id}`"
             class="block px-3 py-2 rounded-md transition-colors text-sm hover:bg-[var(--bg-secondary)]"
-            @click.prevent="scrollTo(chapter.id)"
+            @click.prevent="scrollTo(chapter.id); isMobileNavOpen = false"
           >
             <span class="text-[var(--text-secondary)] mr-2">#{{ chapter.id }}</span>
             <span class="truncate">{{ chapter.title }}</span>
@@ -23,7 +29,12 @@
     <!-- Middle Column: Main Editor Waterfall -->
     <main class="w-full max-w-3xl mx-auto relative">
       <!-- Mobile header fallback -->
-      <h1 class="md:hidden text-2xl font-black mb-6">{{ meta?.title || 'Novel Creation Booster' }}</h1>
+      <div class="md:hidden flex items-center gap-4 mb-6">
+        <button @click="isMobileNavOpen = true" class="p-2 bg-[var(--bg-secondary)] rounded-md hover:opacity-80 transition-opacity">
+          <MenuIcon class="w-5 h-5" />
+        </button>
+        <h1 class="text-2xl font-black m-0">{{ meta?.title || 'Novel Creation Booster' }}</h1>
+      </div>
 
       <!-- The Waterfall -->
       <div v-if="meta?.chapters">
@@ -42,8 +53,8 @@
     </main>
 
     <!-- Right Column: Progress Board (PC) / Top (Mobile) -->
-    <aside class="w-full md:w-auto order-first md:order-last mb-8 md:mb-0 transition-all duration-300 z-40">
-      <div class="sticky top-0 pt-2 pb-4 md:pt-8" style="background-color: var(--header-bg); backdrop-filter: blur(8px);" ref="progressBoardRef">
+    <aside class="w-full md:w-auto order-first md:order-last mb-4 md:mb-0 z-40 sticky top-0 md:static">
+      <div class="pt-2 pb-4 md:sticky md:top-8" style="background-color: var(--header-bg); backdrop-filter: blur(8px);" ref="progressBoardRef">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-bold">Progress</h2>
           <div class="flex items-center gap-2">
@@ -63,7 +74,7 @@
 
         <SegmentedProgressBar :chapters="meta?.chapters || []" class="mb-2" />
         <div class="text-xs text-[var(--text-secondary)] text-center mb-4 font-medium">
-          总体完成度: {{ overallPercentage.toFixed(1) }}% (完成章节 {{ completedChaptersCount }} / {{ totalChaptersCount }})
+          {{ overallPercentage.toFixed(1) }}%
         </div>
         
         <!-- Grid Blocks (fades out on mobile scroll down) -->
@@ -78,7 +89,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { Save, Palette, Download } from 'lucide-vue-next';
+import { Save, Palette, Download, Menu, X } from 'lucide-vue-next';
 import ChapterCard from '../Editor/ChapterCard.vue';
 import SegmentedProgressBar from '../Board/SegmentedProgressBar.vue';
 import GridBlocks from '../Board/GridBlocks.vue';
@@ -86,6 +97,10 @@ import GridBlocks from '../Board/GridBlocks.vue';
 const SaveIcon = Save;
 const PaletteIcon = Palette;
 const DownloadIcon = Download;
+const MenuIcon = Menu;
+const XIcon = X;
+
+const isMobileNavOpen = ref(false);
 
 const props = defineProps({
   meta: Object,

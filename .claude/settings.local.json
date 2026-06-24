@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api *)",
+      "Bash(curl -s \"https://api.github.com/repos/HiyajoKurisu/NCB-Novel_Creation_Booster/pages\")",
+      "Bash(curl -s \"https://api.github.com/repos/HiyajoKurisu/NCB-Novel_Creation_Booster/actions/runs\")",
+      "Bash(git ls-tree *)",
+      "Bash(curl *)"
+    ]
+  }
+}
