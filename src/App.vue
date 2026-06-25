@@ -63,7 +63,7 @@ const onSelectProject = async (project) => {
   initEditor(project);
   const loadedMeta = await loadMeta();
   if (loadedMeta?.title) {
-    updateProjectTitle(project.id, loadedMeta.title);
+    updateProjectTitle(project.id, loadedMeta.title, loadedMeta.description);
   }
 };
 

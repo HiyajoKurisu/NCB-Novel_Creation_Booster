@@ -13,7 +13,7 @@ export function useTheme() {
     }
   };
 
-  const themes = ['default', 'dark', 'eyecare', 'brutalism'];
+  const themes = ['default', 'dark', 'eyecare', 'brutalism', 'warm', 'cyberpunk'];
 
   const toggleTheme = () => {
     const currentIndex = themes.indexOf(theme.value);

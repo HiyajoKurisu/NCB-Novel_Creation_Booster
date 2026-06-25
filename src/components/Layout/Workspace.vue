@@ -4,17 +4,14 @@
     <!-- Left Column: Navigation -->
     <aside :class="['fixed inset-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md transition-transform transform md:relative md:transform-none md:block md:bg-transparent md:z-auto p-4 md:p-0', isMobileNavOpen ? 'translate-x-0' : '-translate-x-full']">
       <div class="sticky top-8 overflow-y-auto h-full md:max-h-[calc(100vh-4rem)] pr-4 custom-scrollbar">
-        <div class="flex justify-between items-center mb-8 md:hidden">
-          <h1 class="text-xl font-black">章节导航</h1>
-          <button @click="isMobileNavOpen = false" class="p-2 bg-[var(--bg-secondary)] rounded-md">
+        <div class="flex items-center gap-4 mb-8 md:hidden">
+          <button @click="isMobileNavOpen = false" class="p-2 bg-[var(--bg-secondary)] rounded-md hover:bg-[var(--border-color)] transition-colors">
             <XIcon class="w-5 h-5" />
           </button>
+          <h1 class="text-xl font-black m-0">章节导航</h1>
         </div>
-        <div class="flex items-center mb-8">
-          <button @click="$emit('back')" class="p-2 mr-3 bg-[var(--bg-secondary)] rounded-md hover:bg-[var(--border-color)] transition-colors" title="返回项目列表">
-            <ArrowLeftIcon class="w-5 h-5" />
-          </button>
-          <h1 class="hidden md:block text-2xl font-black m-0">{{ meta?.title || 'Novel Creation Booster' }}</h1>
+        <div class="hidden md:flex items-center mb-8">
+          <h1 class="text-2xl font-black m-0">{{ meta?.title || 'Novel Creation Booster' }}</h1>
         </div>
         <nav class="space-y-2">
           <a 
@@ -70,21 +67,23 @@
           <div class="flex items-center gap-2">
             <span v-if="saving" class="text-xs text-[var(--text-secondary)] animate-pulse">Saving...</span>
             <span v-if="error" class="text-xs text-red-500" :title="error">Error</span>
+            <button @click="$emit('back')" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="返回项目列表">
+              <ArrowLeftIcon class="w-4 h-4" />
+            </button>
             <button @click="$emit('refresh')" :disabled="saving" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="刷新仓库最新状态">
               <RefreshCwIcon class="w-4 h-4" />
             </button>
             <button @click="onExport" :disabled="saving" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="导出全文">
               <DownloadIcon class="w-4 h-4" />
             </button>
-            <button @click="onSave" :disabled="saving" class="p-1.5 rounded text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center shadow-sm" style="background: var(--accent-gradient);" title="保存所有">
+            <button @click="onSave" :disabled="saving" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="保存所有">
               <SaveIcon class="w-4 h-4" />
             </button>
-            <button @click="onThemeToggle" class="p-1.5 rounded bg-[var(--bg-secondary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)]">
+            <button @click="onThemeToggle" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="切换主题">
               <PaletteIcon class="w-4 h-4" />
             </button>
-            <!-- Mobile Back Button -->
-            <button @click="$emit('back')" class="md:hidden p-1.5 rounded bg-[var(--bg-secondary)] text-red-400 hover:bg-red-400/10 transition-colors border border-transparent" title="返回列表">
-              <ArrowLeftIcon class="w-4 h-4" />
+            <button @click="showHelp = true" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="使用帮助">
+              <HelpCircleIcon class="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -102,14 +101,17 @@
     </aside>
 
   </div>
+  
+  <HelpModal v-if="showHelp" @close="showHelp = false" />
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { Save, Palette, Download, Menu, X, ArrowLeft, RefreshCw } from 'lucide-vue-next';
+import { Save, Palette, Download, Menu, X, ArrowLeft, RefreshCw, HelpCircle } from 'lucide-vue-next';
 import ChapterCard from '../Editor/ChapterCard.vue';
 import SegmentedProgressBar from '../Board/SegmentedProgressBar.vue';
 import GridBlocks from '../Board/GridBlocks.vue';
+import HelpModal from '../HelpModal.vue';
 
 const SaveIcon = Save;
 const PaletteIcon = Palette;
@@ -118,8 +120,10 @@ const MenuIcon = Menu;
 const XIcon = X;
 const ArrowLeftIcon = ArrowLeft;
 const RefreshCwIcon = RefreshCw;
+const HelpCircleIcon = HelpCircle;
 
 const isMobileNavOpen = ref(false);
+const showHelp = ref(false);
 
 const props = defineProps({
   meta: Object,

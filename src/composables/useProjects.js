@@ -62,10 +62,11 @@ export function useProjects() {
     saveProjects();
   };
 
-  const updateProjectTitle = (id, title) => {
+  const updateProjectTitle = (id, title, description) => {
     const p = projects.value.find(p => p.id === id);
     if (p && title) {
       p.title = title;
+      if (description) p.description = description;
       saveProjects();
     }
   };

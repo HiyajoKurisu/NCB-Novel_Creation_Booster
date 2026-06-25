@@ -62,6 +62,36 @@ html[data-theme='brutalism'] {
   --header-bg: #fffbdf;
 }
 
+html[data-theme='warm'] {
+  /* Warm Yellow Theme */
+  --bg-primary: #fdf6e3;
+  --bg-secondary: #f5e6c8;
+  --text-primary: #4a3c31;
+  --text-secondary: #8a7a66;
+  --border-color: #e6d2b5;
+  --accent-color: #d4a373;
+  --accent-gradient: linear-gradient(135deg, #d4a373, #faedcb);
+  --progress-bg: #fffbdf;
+  --card-bg: #ffffff;
+  --card-shadow: 0 4px 6px -1px rgba(212, 163, 115, 0.1);
+  --header-bg: rgba(253, 246, 227, 0.9);
+}
+
+html[data-theme='cyberpunk'] {
+  /* Cyberpunk Theme */
+  --bg-primary: #0d0221;
+  --bg-secondary: #170a30;
+  --text-primary: #00ffcc;
+  --text-secondary: #ff007f;
+  --border-color: #261447;
+  --accent-color: #fcee09;
+  --accent-gradient: linear-gradient(135deg, #ff007f, #00ffcc);
+  --progress-bg: #1a0b2e;
+  --card-bg: #1a0b2e;
+  --card-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+  --header-bg: rgba(13, 2, 33, 0.9);
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);

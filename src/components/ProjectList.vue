@@ -26,6 +26,7 @@
           :key="project.id"
           class="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl p-6 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col relative"
           @click="$emit('select', project)"
+          :title="project.description || project.title"
         >
           <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button @click.stop="$emit('remove', project.id)" class="p-2 text-red-500 hover:bg-red-500/10 rounded-md" title="移除项目">
