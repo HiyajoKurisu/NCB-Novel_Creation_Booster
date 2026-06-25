@@ -31,14 +31,12 @@
           <div class="flex items-center gap-2">
             <!-- 呼吸灯状态 -->
             <span 
-              class="w-2 h-2 rounded-full shadow-[0_0_6px]"
-              :class="{
-                'bg-yellow-500 shadow-yellow-500 animate-pulse': localData?.dirty,
-                'bg-green-500 shadow-green-500 animate-pulse': !localData?.dirty && isCompleted,
-                'bg-blue-500 shadow-blue-500 animate-pulse': !localData?.dirty && !isCompleted && (chapterMeta.current_words > 0),
-                'bg-gray-300 shadow-none': !localData?.dirty && (!chapterMeta.current_words)
+              class="w-2 h-2 rounded-full animate-pulse"
+              :style="{
+                backgroundColor: statusColor,
+                boxShadow: `0 0 6px ${statusColor}`
               }"
-              :title="localData?.dirty ? '未保存' : (isCompleted ? '已完成' : '进行中')"
+              :title="`进度: ${Math.round(completionPercentage * 100)}%`"
             ></span>
             <div class="text-sm font-medium" :style="{ color: isCompleted ? 'var(--accent-color)' : 'var(--text-primary)' }">
               {{ chapterMeta.current_words || 0 }} / {{ chapterMeta.target_words }}
@@ -108,8 +106,22 @@ const content = ref('');
 const synopsisContent = ref(props.chapterMeta.synopsis || '');
 const textareaRef = ref(null);
 
+const completionPercentage = computed(() => {
+  const target = props.chapterMeta.target_words || 1;
+  const current = props.chapterMeta.current_words || 0;
+  return Math.min(1, Math.max(0, current / target));
+});
+
 const isCompleted = computed(() => {
-  return (props.chapterMeta.current_words || 0) >= (props.chapterMeta.target_words || 1);
+  return completionPercentage.value >= 1;
+});
+
+const statusColor = computed(() => {
+  const p = completionPercentage.value;
+  const r = Math.round(156 - 122 * p);
+  const g = Math.round(163 + 34 * p);
+  const b = Math.round(175 - 81 * p);
+  return `rgb(${r}, ${g}, ${b})`;
 });
 
 watch(() => props.localData?.content, (newContent) => {
