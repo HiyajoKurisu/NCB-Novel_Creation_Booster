@@ -17,7 +17,7 @@ export function useTheme() {
     'default': '默认主题',
     'dark': '夜间模式',
     'eyecare': '护眼模式',
-    'brutalism': '极简黑白',
+    'brutalism': '新粗野主义',
     'warm': '暖黄复古',
     'cyberpunk': '赛博朋克'
   };

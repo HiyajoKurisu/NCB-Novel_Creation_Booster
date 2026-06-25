@@ -15,7 +15,7 @@
       ></div>
       <!-- Tooltip -->
       <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 w-max bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap shadow-lg">
-        {{ chapter.id }} {{ chapter.title }} ({{ chapter.current_words || 0 }} / {{ chapter.target_words }})
+        {{ chapter.current_words || 0 }} / {{ chapter.target_words }}
       </div>
     </div>
   </div>

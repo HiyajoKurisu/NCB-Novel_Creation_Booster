@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen grid grid-cols-1 md:grid-cols-[250px_1fr_250px] gap-8 p-4 md:p-8 max-w-[1600px] mx-auto relative">
+  <div class="min-h-screen flex flex-col md:grid md:grid-cols-[250px_1fr_250px] gap-8 p-4 md:p-8 max-w-[1600px] mx-auto relative">
     
     <!-- Left Column: Navigation -->
     <aside :class="['fixed inset-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md transition-transform transform md:relative md:transform-none md:block md:bg-transparent md:z-auto p-4 md:p-0', isMobileNavOpen ? 'translate-x-0' : '-translate-x-full']">
@@ -50,8 +50,8 @@
     </main>
 
     <!-- Right Column: Progress Board (PC) / Top (Mobile) -->
-    <aside class="w-full md:w-auto order-first md:order-last mb-4 md:mb-0 z-40 sticky top-0 md:static">
-      <div class="pt-2 pb-4 md:sticky md:top-8" style="background-color: var(--header-bg); backdrop-filter: blur(8px);" ref="progressBoardRef">
+    <aside class="w-full md:w-auto order-first md:order-last z-40 sticky top-0 md:static">
+      <div class="pt-2 pb-4 md:sticky md:top-8 border-b md:border-none border-[var(--border-color)] shadow-sm md:shadow-none mb-4 md:mb-0" style="background-color: var(--header-bg); backdrop-filter: blur(8px);" ref="progressBoardRef">
         <div class="flex items-center justify-between mb-4">
           <!-- Mobile Menu Button -->
           <button 

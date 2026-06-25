@@ -72,7 +72,7 @@ html[data-theme='warm'] {
   --accent-color: #d4a373;
   --accent-gradient: linear-gradient(135deg, #d4a373, #faedcb);
   --progress-bg: #fffbdf;
-  --card-bg: #ffffff;
+  --card-bg: #fdf3df;
   --card-shadow: 0 4px 6px -1px rgba(212, 163, 115, 0.1);
   --header-bg: rgba(253, 246, 227, 0.9);
 }
@@ -122,4 +122,12 @@ html[data-theme='brutalism'] ::-webkit-scrollbar-thumb {
 }
 html[data-theme='brutalism'] ::-webkit-scrollbar-track {
   border-left: 2px solid #000;
+}
+
+html[data-theme='brutalism'] button:not(.bg-transparent):hover {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+html[data-theme='brutalism'] button:not(.bg-transparent):hover svg {
+  color: #fff !important;
 }
