@@ -20,9 +20,11 @@
               </button>
             </div>
           </div>
-          <button @click="showAddModal = true" class="px-4 py-2 text-white rounded-md font-medium shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2" style="background: var(--accent-gradient)">
-            <PlusIcon class="w-4 h-4" />
-            <span>添加项目</span>
+          <button @click="showHelp = true" class="p-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-md hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)]" title="使用帮助">
+            <HelpCircleIcon class="w-5 h-5" />
+          </button>
+          <button @click="showAddModal = true" class="p-2 text-white rounded-md shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center" style="background: var(--accent-gradient)" title="添加项目">
+            <PlusIcon class="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -61,19 +63,22 @@
       @close="showAddModal = false" 
       @save="onAddProject" 
     />
+    <HelpModal v-if="showHelp" @close="showHelp = false" />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { Plus, BookOpen, Book, Trash2, Palette } from 'lucide-vue-next';
+import { Plus, BookOpen, Book, Trash2, Palette, HelpCircle } from 'lucide-vue-next';
 import AddProjectModal from './AddProjectModal.vue';
+import HelpModal from './HelpModal.vue';
 
 const PlusIcon = Plus;
 const BookOpenIcon = BookOpen;
 const BookIcon = Book;
 const TrashIcon = Trash2;
 const PaletteIcon = Palette;
+const HelpCircleIcon = HelpCircle;
 
 const props = defineProps({
   projects: Array,
@@ -85,6 +90,7 @@ const emit = defineEmits(['select', 'add', 'remove', 'setTheme']);
 
 const showAddModal = ref(false);
 const showThemeMenu = ref(false);
+const showHelp = ref(false);
 
 const onAddProject = (token, userRepo) => {
   emit('add', token, userRepo);

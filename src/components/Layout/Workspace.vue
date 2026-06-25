@@ -95,9 +95,6 @@
                 </button>
               </div>
             </div>
-            <button @click="showHelp = true" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="使用帮助">
-              <HelpCircleIcon class="w-4 h-4" />
-            </button>
           </div>
         </div>
 
@@ -114,8 +111,6 @@
     </aside>
 
   </div>
-  
-  <HelpModal v-if="showHelp" @close="showHelp = false" />
 </template>
 
 <script setup>
@@ -124,7 +119,6 @@ import { Save, Palette, Download, Menu, X, ArrowLeft, RefreshCw, HelpCircle } fr
 import ChapterCard from '../Editor/ChapterCard.vue';
 import SegmentedProgressBar from '../Board/SegmentedProgressBar.vue';
 import GridBlocks from '../Board/GridBlocks.vue';
-import HelpModal from '../HelpModal.vue';
 
 const SaveIcon = Save;
 const PaletteIcon = Palette;
@@ -133,10 +127,8 @@ const MenuIcon = Menu;
 const XIcon = X;
 const ArrowLeftIcon = ArrowLeft;
 const RefreshCwIcon = RefreshCw;
-const HelpCircleIcon = HelpCircle;
 
 const isMobileNavOpen = ref(false);
-const showHelp = ref(false);
 const showThemeMenu = ref(false);
 
 const props = defineProps({
