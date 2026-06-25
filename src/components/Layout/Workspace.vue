@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col md:grid md:grid-cols-[250px_1fr_250px] gap-8 p-4 md:p-8 max-w-[1600px] mx-auto relative">
     
     <!-- Left Column: Navigation -->
-    <aside :class="['fixed inset-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md transition-transform transform md:relative md:transform-none md:block md:bg-transparent md:z-auto p-4 md:p-0', isMobileNavOpen ? 'translate-x-0' : '-translate-x-full']">
+    <aside :class="['fixed inset-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-md transition-transform transform md:relative md:transform-none md:block md:bg-transparent md:backdrop-blur-none md:z-auto p-4 md:p-0', isMobileNavOpen ? 'translate-x-0' : '-translate-x-full']">
       <div class="sticky top-8 overflow-y-auto h-full md:max-h-[calc(100vh-4rem)] pr-4 custom-scrollbar">
         <div class="flex items-center gap-4 mb-8 md:hidden">
           <button @click="isMobileNavOpen = false" class="p-2 bg-[var(--bg-secondary)] rounded-md hover:bg-[var(--border-color)] transition-colors">
