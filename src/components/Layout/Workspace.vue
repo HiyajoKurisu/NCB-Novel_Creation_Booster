@@ -79,9 +79,22 @@
             <button @click="onSave" :disabled="saving" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="保存所有">
               <SaveIcon class="w-4 h-4" />
             </button>
-            <button @click="onThemeToggle" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="切换主题">
-              <PaletteIcon class="w-4 h-4" />
-            </button>
+            <div class="relative">
+              <button @click="showThemeMenu = !showThemeMenu" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="切换主题">
+                <PaletteIcon class="w-4 h-4" />
+              </button>
+              <div v-if="showThemeMenu" class="absolute right-0 top-full mt-2 w-32 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg shadow-lg overflow-hidden z-50">
+                <button 
+                  v-for="(name, val) in themeOptions" 
+                  :key="val"
+                  @click="$emit('setTheme', val); showThemeMenu = false"
+                  class="w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[var(--bg-secondary)]"
+                  :class="{ 'font-bold text-[var(--accent-color)]': theme === val, 'text-[var(--text-primary)]': theme !== val }"
+                >
+                  {{ name }}
+                </button>
+              </div>
+            </div>
             <button @click="showHelp = true" class="p-1.5 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)] shadow-sm" title="使用帮助">
               <HelpCircleIcon class="w-4 h-4" />
             </button>
@@ -124,15 +137,18 @@ const HelpCircleIcon = HelpCircle;
 
 const isMobileNavOpen = ref(false);
 const showHelp = ref(false);
+const showThemeMenu = ref(false);
 
 const props = defineProps({
   meta: Object,
   chaptersData: Object,
   saving: Boolean,
-  error: String
+  error: String,
+  theme: String,
+  themeOptions: Object
 });
 
-const emit = defineEmits(['loadChapter', 'updateContent', 'updateSynopsis', 'save', 'saveChapter', 'export', 'toggleTheme', 'back', 'refresh']);
+const emit = defineEmits(['loadChapter', 'updateContent', 'updateSynopsis', 'save', 'saveChapter', 'export', 'setTheme', 'back', 'refresh']);
 
 const totalCurrentWords = computed(() => {
   return (props.meta?.chapters || []).reduce((sum, ch) => sum + (ch.current_words || 0), 0);
@@ -181,10 +197,6 @@ const onSave = () => {
 
 const onExport = () => {
   emit('export');
-};
-
-const onThemeToggle = () => {
-  emit('toggleTheme');
 };
 
 const scrollTo = (id) => {

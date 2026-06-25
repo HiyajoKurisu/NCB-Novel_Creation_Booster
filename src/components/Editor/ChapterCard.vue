@@ -9,44 +9,49 @@
         <h3 class="text-xl font-bold flex items-center gap-3">
           <span class="text-[var(--text-secondary)] text-lg">#{{ chapterMeta.id }}</span>
           {{ chapterMeta.title }}
+          <span v-if="localData?.dirty" class="ml-2 px-2 py-0.5 text-xs font-normal rounded text-yellow-500 bg-yellow-500/10 border border-yellow-500/30 animate-pulse">
+            有更改
+          </span>
         </h3>
         <p v-show="!isExpanded && chapterMeta.synopsis" class="mt-2 text-[var(--text-secondary)] text-sm leading-relaxed truncate">
           {{ chapterMeta.synopsis }}
         </p>
       </div>
-      <div class="flex flex-col items-end shrink-0">
-        <div class="flex items-center gap-2 mb-1">
-          <!-- 呼吸灯状态 -->
-          <span 
-            class="w-2 h-2 rounded-full shadow-[0_0_6px]"
-            :class="{
-              'bg-yellow-500 shadow-yellow-500 animate-pulse': localData?.dirty,
-              'bg-green-500 shadow-green-500 animate-pulse': !localData?.dirty && isCompleted,
-              'bg-blue-500 shadow-blue-500 animate-pulse': !localData?.dirty && !isCompleted && (chapterMeta.current_words > 0),
-              'bg-gray-300 shadow-none': !localData?.dirty && (!chapterMeta.current_words)
-            }"
-            :title="localData?.dirty ? '未保存' : (isCompleted ? '已完成' : '进行中')"
-          ></span>
-          <div class="text-sm font-medium" :style="{ color: isCompleted ? 'var(--accent-color)' : 'var(--text-primary)' }">
-            {{ chapterMeta.current_words || 0 }} / {{ chapterMeta.target_words }}
+      <div class="flex items-center shrink-0">
+        <div class="flex items-center gap-3">
+          <button 
+            v-if="localData?.dirty && isExpanded" 
+            @click.stop="$emit('save', chapterMeta.id)"
+            class="px-2 py-1 bg-[var(--accent-color)] text-white text-xs rounded hover:opacity-90 transition-opacity shadow-sm flex items-center gap-1"
+            title="保存本章"
+          >
+            <SaveIcon class="w-3 h-3" /> 保存
+          </button>
+          
+          <div class="flex items-center gap-2">
+            <!-- 呼吸灯状态 -->
+            <span 
+              class="w-2 h-2 rounded-full shadow-[0_0_6px]"
+              :class="{
+                'bg-yellow-500 shadow-yellow-500 animate-pulse': localData?.dirty,
+                'bg-green-500 shadow-green-500 animate-pulse': !localData?.dirty && isCompleted,
+                'bg-blue-500 shadow-blue-500 animate-pulse': !localData?.dirty && !isCompleted && (chapterMeta.current_words > 0),
+                'bg-gray-300 shadow-none': !localData?.dirty && (!chapterMeta.current_words)
+              }"
+              :title="localData?.dirty ? '未保存' : (isCompleted ? '已完成' : '进行中')"
+            ></span>
+            <div class="text-sm font-medium" :style="{ color: isCompleted ? 'var(--accent-color)' : 'var(--text-primary)' }">
+              {{ chapterMeta.current_words || 0 }} / {{ chapterMeta.target_words }}
+            </div>
           </div>
         </div>
-        
-        <button 
-          v-if="localData?.dirty && isExpanded" 
-          @click.stop="$emit('save', chapterMeta.id)"
-          class="mt-1 p-1.5 bg-[var(--accent-color)] text-white rounded hover:opacity-90 transition-opacity shadow-sm"
-          title="保存本章"
-        >
-          <SaveIcon class="w-4 h-4" />
-        </button>
       </div>
     </div>
 
     <!-- Editor Body (Visible when expanded) -->
     <div v-show="isExpanded" class="border-t border-[var(--border-color)] relative">
       <div v-if="isLoading" class="absolute inset-0 bg-[var(--card-bg)]/80 backdrop-blur-sm flex items-center justify-center z-10">
-        <span class="animate-pulse font-medium">Loading from GitHub...</span>
+        <span class="animate-pulse font-medium text-lg text-[var(--accent-color)]">读取中...</span>
       </div>
       
       <!-- Synopsis Editor -->
@@ -54,9 +59,10 @@
         <label class="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">大纲</label>
         <textarea
           v-model="synopsisContent"
-          class="w-full min-h-[40px] bg-transparent border-none focus:outline-none resize-none text-sm text-[var(--text-secondary)] custom-scrollbar"
+          class="w-full min-h-[40px] bg-transparent border-none focus:outline-none resize-none text-sm text-[var(--text-secondary)] custom-scrollbar disabled:opacity-50"
           placeholder="在此输入本章大纲或备忘录..."
           @input="handleSynopsisInput"
+          :disabled="isLoading"
         ></textarea>
       </div>
 
@@ -66,9 +72,10 @@
         <textarea
           ref="textareaRef"
           v-model="content"
-          class="w-full min-h-[300px] bg-transparent border-none focus:outline-none resize-none leading-loose text-lg"
+          class="w-full min-h-[300px] bg-transparent border-none focus:outline-none resize-none leading-loose text-lg disabled:opacity-50"
           placeholder="开始创作..."
           @input="handleInput"
+          :disabled="isLoading"
         ></textarea>
       </div>
     </div>

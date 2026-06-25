@@ -2,10 +2,12 @@
   <div v-if="!selectedProject" class="min-h-screen bg-[var(--bg-primary)]">
     <ProjectList 
       :projects="projects"
+      :theme="theme"
+      :themeOptions="themeOptions"
       @add="onAddProject"
       @remove="removeProject"
       @select="onSelectProject"
-      @toggleTheme="toggleTheme"
+      @setTheme="setTheme"
     />
   </div>
   <div v-else class="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
@@ -15,13 +17,15 @@
       :chaptersData="chaptersData"
       :saving="saving"
       :error="error"
+      :theme="theme"
+      :themeOptions="themeOptions"
       @loadChapter="loadChapter"
       @updateContent="updateChapterContent"
       @updateSynopsis="updateChapterSynopsis"
       @save="onManualSave"
       @saveChapter="saveChapter"
       @export="exportNovel"
-      @toggleTheme="toggleTheme"
+      @setTheme="setTheme"
       @back="onBackToProjects"
       @refresh="onRefresh"
     />
@@ -52,7 +56,7 @@ const {
   saveChapter, exportNovel, refreshAll
 } = useEditor();
 
-const { toggleTheme } = useTheme();
+const { theme, themeOptions, setTheme } = useTheme();
 
 const onAddProject = (token, userRepo) => {
   addProject(token, userRepo);

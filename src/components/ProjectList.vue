@@ -4,9 +4,22 @@
       <div class="flex items-center justify-between mb-8">
         <h1 class="text-3xl font-black text-[var(--text-primary)]">我的小说库</h1>
         <div class="flex items-center gap-2">
-          <button @click="$emit('toggleTheme')" class="p-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-md hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)]">
-            <PaletteIcon class="w-5 h-5" />
-          </button>
+          <div class="relative">
+            <button @click="showThemeMenu = !showThemeMenu" class="p-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-md hover:bg-[var(--border-color)] transition-colors border border-transparent hover:border-[var(--border-color)]" title="选择主题">
+              <PaletteIcon class="w-5 h-5" />
+            </button>
+            <div v-if="showThemeMenu" class="absolute right-0 top-full mt-2 w-32 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg shadow-lg overflow-hidden z-50">
+              <button 
+                v-for="(name, val) in themeOptions" 
+                :key="val"
+                @click="$emit('setTheme', val); showThemeMenu = false"
+                class="w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[var(--bg-secondary)]"
+                :class="{ 'font-bold text-[var(--accent-color)]': theme === val, 'text-[var(--text-primary)]': theme !== val }"
+              >
+                {{ name }}
+              </button>
+            </div>
+          </div>
           <button @click="showAddModal = true" class="px-4 py-2 text-white rounded-md font-medium shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2" style="background: var(--accent-gradient)">
             <PlusIcon class="w-4 h-4" />
             <span>添加项目</span>
@@ -63,12 +76,15 @@ const TrashIcon = Trash2;
 const PaletteIcon = Palette;
 
 const props = defineProps({
-  projects: Array
+  projects: Array,
+  theme: String,
+  themeOptions: Object
 });
 
-const emit = defineEmits(['select', 'add', 'remove', 'toggleTheme']);
+const emit = defineEmits(['select', 'add', 'remove', 'setTheme']);
 
 const showAddModal = ref(false);
+const showThemeMenu = ref(false);
 
 const onAddProject = (token, userRepo) => {
   emit('add', token, userRepo);
