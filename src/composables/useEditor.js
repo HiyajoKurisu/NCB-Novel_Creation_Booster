@@ -259,7 +259,7 @@ export function useEditor() {
     loading.value = true;
     error.value = null;
     try {
-      let fullText = meta.value.title + '\n\n';
+      let fullText = '';
       
       for (const chapterMeta of meta.value.chapters) {
         const chapterId = chapterMeta.id;
@@ -275,11 +275,11 @@ export function useEditor() {
             content = data.content;
             chaptersData[chapterId] = { content: data.content, sha: data.sha, dirty: false };
           } catch(e) {
-            content = '[未找到章节内容]';
+            content = '';
           }
         }
         
-        fullText += `### ${chapterMeta.id} ${chapterMeta.title}\n\n${content}\n\n`;
+        fullText += content;
       }
       
       const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
@@ -302,16 +302,23 @@ export function useEditor() {
   const refreshAll = async () => {
     if (!github || saving.value || loading.value) return;
     
-    // Clear in-memory dirty drafts if any (user should be warned before calling this)
+    // Track previously loaded chapters so we can reload them
+    const previouslyLoaded = [];
     for (const id in chaptersData) {
-      if (chaptersData[id]) {
-        chaptersData[id].content = undefined;
-        chaptersData[id].dirty = false;
+      if (chaptersData[id] && chaptersData[id].content !== undefined) {
+        previouslyLoaded.push(id);
       }
+      // Clear local cache for all chapters to force fetch from GitHub
+      localStorage.removeItem(`ncb_draft_${githubConfig.repo}_${id}`);
+      delete chaptersData[id];
     }
     
     await loadMeta();
-    // Chapters will be re-fetched when ChapterCard emits 'load' event since their content is now undefined
+    
+    // Re-fetch all chapters that were already loaded
+    for (const id of previouslyLoaded) {
+      await loadChapter(id);
+    }
   };
 
   return {
